@@ -1,0 +1,392 @@
+2. Design direction: "Night at the Yamuna"
+
+Every visual choice comes from the subject: Krishna, the peacock feather, marigold garlands, river at dusk, oil lamps. Not generic wellness teal-and-white, not a purple AI gradient.
+
+The one memorable thing: the Listening Orb, a large circular recorder in the middle of the voice screen. It breathes slowly when idle, its edge becomes a live waveform while recording, and it settles into the detected emotion's color when analysis finishes. Everything else in the app stays quiet so this one element carries the personality.
+
+Mood words: dusk, lamplight, still water, unhurried, private.
+
+Avoid: cream-and-terracotta "AI editorial" look, neon gradients, glassmorphism everywhere, identical rounded-card grids, emoji as decoration, confetti, stock-photo lotuses, saffron-and-om clichés, ALL-CAPS tracked eyebrow labels above every heading, 01 / 02 / 03 numbering on content that isn't a sequence.
+
+3. Design tokens
+
+Put these at the top of src/styles/app.css. Dark ("Night") is the default because the app is often used in the evening and when people are low; provide a light ("Day") theme via prefers-color-scheme plus a manual toggle that stores the choice in localStorage key emogita-theme.
+
+3.1 Color
+css
+:root {
+  /* Surfaces (Night) */
+  --bg:            #0B2A35;  /* Yamuna: page background */
+  --bg-deep:       #07202A;  /* behind modals, footer */
+  --surface:       #123846;  /* panels */
+  --surface-raised:#184656;  /* hover/raised panels */
+  --line:          #2A5767;  /* 1px dividers, borders */
+
+  /* Text */
+  --text:          #EAF2F1;  /* primary, 13:1 on --bg */
+  --text-muted:    #9DB8BC;  /* secondary, 6:1 on --bg */
+  --text-faint:    #6F8E94;  /* hints only, never for essential info */
+
+  /* Brand */
+  --peacock:       #2BA39A;  /* primary actions, links, focus */
+  --peacock-strong:#1E827B;  /* pressed */
+  --marigold:      #F2A93B;  /* the single warm accent: verse markers, key highlights */
+  --lotus:         #E7A6B5;  /* soft secondary: gentle states, empty illustrations */
+
+  /* Feedback */
+  --danger:        #E86A5C;
+  --success:       #5CC49A;
+
+  /* Radii: use different ones on purpose */
+  --r-sm: 6px;   /* inputs, chips */
+  --r-md: 14px;  /* panels */
+  --r-lg: 28px;  /* sheets, modals */
+  --r-full: 999px;
+
+  /* Elevation: tinted, not grey */
+  --shadow-1: 0 1px 2px rgba(3, 18, 24, .5);
+  --shadow-2: 0 12px 32px rgba(3, 18, 24, .45);
+}
+
+:root[data-theme="light"] {
+  --bg:            #F1F6F5;
+  --bg-deep:       #E3EEEC;
+  --surface:       #FFFFFF;
+  --surface-raised:#F7FBFA;
+  --line:          #C9DBD9;
+  --text:          #11323C;
+  --text-muted:    #476A72;
+  --text-faint:    #7A9499;
+  --peacock:       #17746D;
+  --peacock-strong:#0F5A54;
+  --marigold:      #A86400;  /* darkened so text passes contrast on light */
+  --lotus:         #B5576E;
+  --danger:        #B93A2D;
+  --success:       #23805C;
+  --shadow-1: 0 1px 2px rgba(17, 50, 60, .12);
+  --shadow-2: 0 12px 32px rgba(17, 50, 60, .14);
+}
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) { /* duplicate the light values above */ }
+}
+3.2 Emotion colors
+
+Each emotion has a color and an icon and a label. Never communicate emotion by color alone.
+
+Emotion	Token	Night value	Icon idea (inline SVG)
+Angry	--emo-angry	
+#E0574A	flame
+Disgust	--emo-disgust	
+#98A840	slashed circle
+Fear	--emo-fear	
+#9A6FD0	wide eye / trembling circle
+Happiness	--emo-happiness	
+#F2B632	sun
+Neutral	--emo-neutral	
+#8FA3AA	flat horizon line
+Confidence	--emo-confidence	
+#34C49C	upward chevron / mountain
+Sadness	--emo-sadness	
+#5B74CC	raindrop
+
+In Day theme, darken each by ~15% for text use; fills can stay as is. Expose a helper emotionMeta(name) in src/utils/emotion.js returning { color, icon, label, tone } so every component uses the same mapping.
+
+3.3 Typography
+
+Load via Google Fonts in public/index.html:
+
+Reading & verse face: Literata (400, 500, 600, italic 400). Used for advice text, verse translations, big headlines. Long-form serif with warm texture; line-height 1.7.
+Sanskrit: Tiro Devanagari Sanskrit (400). Used only for the verse in Devanagari. Line-height 1.9, never smaller than 20px.
+Interface face: Instrument Sans (400, 500, 600). Buttons, nav, forms, chart labels, numbers.
+
+Fallback stacks: Literata, Georgia, serif · "Tiro Devanagari Sanskrit", "Noto Serif Devanagari", serif · "Instrument Sans", system-ui, sans-serif.
+
+Scale (mobile → desktop, use clamp):
+
+Role	Font	Size	Weight
+Display	Literata	clamp(2.25rem, 6vw, 4rem)	500
+H1	Literata	clamp(1.75rem, 4vw, 2.5rem)	500
+H2	Literata	1.375rem	500
+Body (advice)	Literata	1.125rem	400, lh 1.7
+UI body	Instrument Sans	1rem	400
+UI small	Instrument Sans	.875rem	500
+Verse (Sanskrit)	Tiro Devanagari	clamp(1.5rem, 3.5vw, 2rem)	400
+
+Rules: sentence case everywhere. Body line length max 68 characters (max-width: 68ch). No letter-spaced uppercase labels. Numbers in the dashboard use font-variant-numeric: tabular-nums.
+
+3.4 Spacing & layout
+4px base unit. Scale: 4, 8, 12, 16, 24, 32, 48, 72, 112.
+Content column: max-width: 1200px, side padding 16px mobile / 32px desktop.
+Reading column (guidance, verse): max-width: 680px, centered.
+Alignment: left-aligned text by default. Center only the Listening Orb screen and the processing screen.
+Touch targets ≥ 48×48px. Primary action sits in the bottom thumb zone on mobile.
+3.5 Motion
+Ambient motion only in one place: the Listening Orb (slow breathing, 6s ease-in-out loop, scale 1 → 1.04).
+All other motion responds to a user action (open, expand, confirm), 160–240ms, cubic-bezier(.2,.7,.2,1).
+No staggered fade-up on every section. No hover-lift on every card.
+One orchestrated reveal is allowed: on the Guidance page, the verse fades in first, then the advice text, then the audio player (total ≤ 900ms).
+Respect prefers-reduced-motion: reduce: replace the breathing and waveform animation with a static ring and a simple level bar; disable the reveal.
+4. Core components
+
+Build these in src/components/ and reuse everywhere. Every interactive component needs visible focus (outline: 2px solid var(--peacock); outline-offset: 3px), hover, active, disabled and loading states.
+
+4.1 PrimaryButton
+Height 52px, --r-full, background --peacock, text --bg-deep in Night / white in Day, Instrument Sans 600.
+Variants via prop: primary, secondary (1px --line border, transparent), quiet (text only), danger.
+loading prop shows a small spinner and keeps width fixed; sets aria-busy.
+Button text is a verb phrase: "Start speaking", "Save and continue", "Play advice". Do not append arrows.
+4.2 VoiceRecorder (the Listening Orb)
+Orb diameter: min(72vw, 320px). Background is a radial gradient from --surface-raised to --surface, with a 1px --line ring.
+States:
+Idle: breathing ring in --peacock. Label inside: "Tap to speak". Under it, a one-line hint: "Tell me what's on your mind. Take as long as you need."
+Requesting permission: orb dims; text "Allow microphone access in your browser".
+Recording: orb edge becomes a circular waveform driven by AnalyserNode data (use Web Audio API on the same MediaStream already used by MediaRecorder). Show a running timer 0:00 (tabular nums) and a Stop button below. Soft cap at 120s with a gentle "One more minute" notice at 60s.
+Review: shows playback of the recording (small linear player), buttons "Use this recording" (primary) and "Record again" (secondary).
+Error: mic denied, no mic found, or recording too short (< 2s). Message explains the fix in plain words. Offer the text alternative: "Prefer to type instead?" linking to TextEmotion.
+Accessibility: the orb is a <button> with aria-pressed; announce state changes in an aria-live="polite" region.
+4.3 EmotionCard / EmotionDisplay
+Not a pill-in-a-card. Show: emotion icon (48px, in emotion color), emotion name in H2, a single plain sentence describing it in the product voice (see Copy), and a confidence bar set.
+Probability bars: all 7 emotions as horizontal bars sorted descending, top one in its emotion color, the rest in --line. Show percentages with tabular numbers. Bars animate width once on mount only.
+EmotionDisplay is the compact variant (icon + name + %), used in history lists.
+4.4 AudioPlayer
+Custom controls over <audio>: round play/pause button (56px), a seek bar, elapsed/total time, and a speed toggle (0.85×, 1×, 1.15×).
+A simple 40-bar static waveform decoration is acceptable; progress fills it from left to right.
+Autoplay is never enabled. Show a clear "Play advice" state first.
+Loading state: skeleton of the player while the mp3 URL resolves. Error state: "Audio isn't available right now. You can still read the advice below." (do not block the page).
+4.4b Loader
+Single component with two modes: inline (small ring) and screen (full-screen processing, see 5.7). Replace any bouncing dots with a slow-turning ring so it does not feel frantic.
+4.5 Navbar
+Mobile: top bar with wordmark left, theme toggle and profile menu right. Primary destinations in a bottom tab bar (Speak, History, Insights) for logged-in users.
+Desktop: top bar with wordmark, three text links, profile menu.
+Logged-out: wordmark left, "Log in" quiet button and "Get started" primary button right.
+Wordmark: "EmoGita" set in Literata 600, with the project logo mark (Emogita Logo.jpeg, crop to a circle at 32px) before it.
+4.6 Form fields
+Label above, 16px minimum input text (prevents iOS zoom), height 52px, --r-sm, 1px --line border, focus border --peacock + 2px outer ring at 30% opacity.
+Inline validation under the field, in --danger, explains the fix ("Password needs at least 8 characters"). Never rely on color alone: add an icon.
+Password field has a show/hide toggle with an accessible label.
+4.7 Panels
+Use --surface panels with --r-md and a 1px --line border. Vary panel sizes and structure by content; do not present everything as a uniform grid of identical cards. Use dividers and whitespace for grouping when a panel is not needed.
+4.8 Toasts & banners
+Toasts bottom-center on mobile, top-right on desktop, auto-dismiss 5s, with a close button. Use the same verb as the action: button "Save and continue" → toast "Saved".
+Persistent banners (e.g. offline, session expired) sit under the navbar and don't auto-dismiss.
+5. Screens
+5.0 App shell & routing
+Wrap pages in a shell with the Navbar and a main landmark (<main id="main">), plus a "Skip to main content" link.
+Route guards: logged-out users are redirected to Login; logged-in users without a profile are redirected through requireProfile to ProfileOnboarding.
+Page transitions: none (instant). Keep the app feeling still.
+5.1 Landing (Landing.jsx)
+
+Job: In 5 seconds, say what this is and get a first tap.
+
+┌──────────────────────────────────────┐
+│ ◐ EmoGita            Log in  [Start] │
+│                                      │
+│  Say what's weighing on you.         │
+│  Hear what the Gita says about it.   │
+│                                      │
+│  [ Start speaking ]   How it works ↓ │  ← no arrow on the button itself
+│                                      │
+│        ( breathing Orb, decorative ) │
+│                                      │
+│  A verse ──────────────────────────  │
+│  कर्मण्येवाधिकारस्ते मा फलेषु कदाचन     │
+│  "You have a right to your actions,  │
+│   never to their fruits." — 2.47     │
+│                                      │
+│  How it works  (3 steps, a true      │
+│  sequence, so numbering is allowed)  │
+│  Speak → We listen to voice & words  │
+│  → You get a verse and guidance      │
+│                                      │
+│  What you can track                  │
+│  (small real dashboard preview)      │
+│                                      │
+│  Privacy note + footer               │
+└──────────────────────────────────────┘
+The hero headline is two plain sentences, Literata Display, left-aligned on desktop, with the decorative Orb to the right. On mobile the Orb sits under the headline.
+The verse block is real content (Gita 2.47), Sanskrit in Tiro Devanagari with English below. This is the hero's "characteristic" moment.
+A "Not a replacement for therapy" line appears in the footer and on the "How it works" section.
+Include a small peacock-feather motif as an inline SVG divider (stylized: an eye with radiating barbs in --peacock and --marigold), used at most twice on the page.
+5.2 Login & Register
+Centered single-column form, max 400px, on the page background (no card chrome). Wordmark above.
+Fields: Email, Password (Register adds Confirm password).
+Primary button full width. Secondary link below: "New here? Create an account" / "Already have an account? Log in".
+Errors: invalid credentials → "Email or password is incorrect. Check them and try again." Rate limit (429) → "Too many attempts. Wait a minute and try again."
+Loading state on the button, form disabled during request.
+5.3 ProfileOnboarding
+
+Job: Collect profession_category and work_description so the guidance can be relevant, without feeling like a form.
+
+Two steps on one page with a progress indicator (this is a true sequence): 1) "What do you do?" (choice chips: Student, Working professional, Homemaker, Self-employed, Retired, Other), 2) "Tell me a little about your day" (textarea, optional, 3 rows, example placeholder text).
+Explain why: "This helps the advice fit your life. You can change it later."
+Buttons: "Continue" and "Skip for now" (skip saves category only, if chosen).
+5.4 VoiceInput (primary screen, the heart of the app)
+┌──────────────────────────────────────┐
+│ Navbar                               │
+│                                      │
+│        How are you feeling today?    │
+│                                      │
+│              ╭────────╮              │
+│             ╱  ~~~~~~  ╲             │
+│            │ Tap to speak │          │
+│             ╲  ~~~~~~  ╱             │
+│              ╰────────╯              │
+│          0:00                        │
+│   Take as long as you need.          │
+│                                      │
+│       Prefer to type instead?        │
+│                                      │
+│  Bottom tabs: Speak | History | Insights │
+└──────────────────────────────────────┘
+Centered layout. Orb occupies the visual center; nothing else competes.
+After "Use this recording", navigate to Processing.
+Show a small privacy line under the orb: "Your recording is used to understand how you feel and to write your advice."
+5.5 VoiceEmotionPage & TextEmotion
+VoiceEmotionPage: shows what the voice model heard: emotion icon, name, probability bars (see 4.3). Primary button "Continue".
+TextEmotion: a large textarea (min 6 rows, autosize), character counter, and the transcribed text shown if coming from voice (editable, labeled "What we heard. Fix anything that's wrong."). Primary button "Analyze". Editing the transcript re-runs /text-emotion.
+Clearly label Voice and Words results as two signals feeding one result; show them side by side on desktop, stacked on mobile.
+5.6 EmotionResult (fused result)
+
+Job: Show the person they were understood, then move them to guidance.
+
+Top: the Listening Orb, now static and filled with the dominant emotion's color, emotion icon inside.
+H1: "You sound {emotion}." (No partial-word styling; whole sentence in one style.)
+One-sentence plain description under it.
+Below: "How we got here" panel with the fused probability bars and two small rows: "Your voice (80%)" and "Your words (20%)" each with their top emotion. This is optional detail, collapsed by default (<details>), because most users only want the answer.
+Primary button: "Get guidance". Secondary quiet button: "That's not right" → opens a bottom sheet letting the user pick the emotion manually (sends the chosen emotion into the next step).
+5.7 Processing
+Full-screen, centered, dark-on-dark. The Orb slowly turns (Loader screen mode).
+Show honest stage labels that change as real requests complete: "Listening to your voice", "Reading your words", "Finding verses that fit", "Writing your advice". Each completed stage gets a small check; the current one is the only one with motion.
+If a step takes > 12s: "This is taking longer than usual. Hang tight." After 45s: error with "Try again" and "Go back".
+Backend may be cold (Hugging Face Spaces). On first request failure/timeout, retry once silently before showing the error.
+5.8 Guidance (the payoff; spend the most care here)
+┌──────────────────────────────────────┐
+│  You sound anxious    (icon + chip)  │
+│                                      │
+│  ──────────────────────────────────  │
+│   VERSE                              │
+│   कर्मण्येवाधिकारस्ते ...               │  ← Tiro Devanagari, marigold left rule
+│   You have a right to your actions…  │  ← Literata italic
+│   Bhagavad Gita 2.47                 │
+│  ──────────────────────────────────  │
+│                                      │
+│  [▶ Play advice   0:00 / 1:24]       │  ← AudioPlayer
+│                                      │
+│  Advice text (React Markdown),       │
+│  Literata 18px, 68ch, lh 1.7         │
+│                                      │
+│  ▸ More verses that came up (4)      │  ← expandable, other top-5 results
+│                                      │
+│  [ Save to my history ] [ New reflection ] │
+│                                      │
+│  Gentle note: EmoGita offers reflection, │
+│  not medical or professional advice.  │
+└──────────────────────────────────────┘
+Reading column 680px. The verse block has a 3px --marigold left border, generous padding, and no card background.
+Markdown styling: paragraphs with 1em spacing, strong in --text at weight 600, blockquotes get the marigold left rule, lists have proper indentation.
+Show "More verses that came up" using the remaining results from /rag-gita as collapsed list items (chapter.verse + translation excerpt + expand for full text).
+The orchestrated reveal (Section 3.5) happens here once.
+Streaming is not available; show the Processing screen until the advice arrives, then reveal.
+Wellbeing guard: if the user's emotion-analytics shows a consecutive-negative streak of 5 or more (or emotion is Sadness/Fear with high confidence repeatedly), show a calm, non-alarming panel: "You've had a heavy few days. Talking to someone you trust can help, and so can a professional." with a button "Find support" linking to a short static page of region-appropriate helplines (placeholder route /support; copy content to be supplied by the project owner). This is not a modal and not red.
+5.9 Dashboard (history + insights)
+
+Two tabs at top: Insights and Past reflections. On mobile these map to the bottom tab bar.
+
+Insights tab
+
+┌──────────────────────────────────────────────┐
+│  This week                                   │
+│  ┌──────────────┐  Stability trend (30 days) │
+│  │  ◜ 72 ◝      │  ┌──────────────────────┐  │
+│  │ ring gauge   │  │  area chart           │  │
+│  │ "Steady"     │  └──────────────────────┘  │
+│  └──────────────┘                            │
+│  Emotion mix (last 30 days)  ▇▇▇▅▃▂▁          │
+│  Streak: ● ● ○ ○ ○ ○ ○  (last 7 sessions)    │
+└──────────────────────────────────────────────┘
+Stability ring gauge (0–100): a single SVG ring with a 270° arc. Fill color changes by band: 0–39 --emo-sadness, 40–69 --marigold, 70–100 --emo-confidence. Center shows the number (Instrument Sans, 600, 3rem) and a word label ("Rough patch", "Finding balance", "Steady"). Add a one-line plain explanation of how it is calculated in a tooltip/<details>.
+Trend chart (Recharts AreaChart): single line with a soft area fill in --peacock at 18% opacity, dots only on hover, y-axis 0–100 with 3 gridlines, x-axis dates as 12 Oct. Tooltip shows score and the dominant emotion that day.
+Emotion mix: horizontal stacked bar or a simple sorted bar list using emotion colors, each with icon + label + count. No pie charts.
+Negative streak: row of the last 7 sessions as dots filled with the emotion color (icon on hover/focus), with the consecutive-negative count in text when it is 2 or more.
+Empty state (no sessions): a calm panel with the static Orb, "Your insights will appear after your first reflection." and a "Start speaking" button.
+
+Past reflections tab
+
+Vertical list grouped by week. Each row: emotion icon + name, date/time, one-line preview of transcribed_text, and a small play button if audio_url exists.
+Tap a row to open a bottom sheet (mobile) / side panel (desktop) with the full advice text (React Markdown), the verse used and the audio player.
+Loading: 5 skeleton rows. Error: "We couldn't load your history. Try again." with a retry button.
+5.10 NotFound
+Centered, short: "This page isn't here." with a primary button "Go to home". Use the peacock-feather SVG at 120px above the text.
+6. Copy & voice
+Voice of the product: calm, direct, kind. Plain words. No spiritual jargon in UI labels (save Sanskrit for verses). No exclamation marks except on genuinely positive confirmations (rarely).
+Speak to the person: "You sound anxious", not "Anxiety detected".
+Errors say what happened and what to do next. They do not apologize and do not blame the user.
+An action keeps one name across the flow (button "Save to my history" → toast "Saved to your history").
+Empty states are an invitation to act, not decoration.
+Emotion descriptions (one sentence each, use exactly these or close variants):
+Angry: "There's frustration or anger in how you spoke."
+Disgust: "Something feels wrong or unacceptable to you right now."
+Fear: "There's worry or unease in your voice."
+Happiness: "You sound light and glad."
+Neutral: "You sound calm and even."
+Confidence: "You sound sure and steady."
+Sadness: "There's heaviness or sadness in how you spoke."
+7. States checklist (apply on every screen)
+State	Requirement
+Loading	Skeletons for lists/charts; Loader for blocking actions; never a blank screen
+Empty	Purposeful message + one action
+Error	Plain explanation + retry/back; log details to console only
+Offline	Banner "You're offline. Reconnect to continue." and disable submit buttons
+Session expired (401)	Redirect to Login with message "Your session ended. Log in again."
+Rate limited (429)	"You're going a little fast. Try again in a minute."
+Slow backend	After 12s show reassurance text; retry once automatically
+Success	Toast using the same verb as the action
+8. Accessibility & quality floor
+WCAG 2.2 AA contrast for all text and UI components. Check muted text in both themes.
+Full keyboard operation, visible focus on everything, logical tab order, skip link.
+Semantic landmarks (header, nav, main, footer), one h1 per page.
+All icons have text alternatives or are aria-hidden when paired with a label.
+Charts have an accessible text summary (e.g. "Stability score rose from 58 to 72 over the last 14 days") and a data table fallback inside <details>.
+prefers-reduced-motion honored (Section 3.5). prefers-color-scheme honored (Section 3.1).
+Responsive from 320px to 1440px with no horizontal scroll. Test at 375, 768, 1024, 1440.
+Respect safe areas on iOS: padding-bottom: env(safe-area-inset-bottom) on the bottom tab bar.
+Images lazy-loaded; fonts use font-display: swap; keep the landing page under 300 KB excluding fonts.
+9. Privacy & trust UI
+Before the first recording, a one-time dialog: "We'll use your microphone to hear how you feel. Your recording is processed to understand your emotion and write your advice." Buttons "Allow and continue" / "Not now". Store acknowledgment in localStorage key emogita-mic-ack.
+In Dashboard settings (profile menu), include "Delete my history" with a confirmation step (UI only for now; wire to an endpoint when one exists, otherwise hide it).
+Footer disclaimer on every page: "EmoGita offers reflection inspired by the Bhagavad Gita. It is not medical advice or a substitute for professional care."
+10. Build order for the agent
+Foundations: fonts in public/index.html; tokens, reset, base typography, focus styles, theme toggle in src/styles/app.css; src/utils/emotion.js helper; PrimaryButton, Loader, form field styles, toasts.
+Shell: Navbar (top + bottom tabs), layout wrapper, skip link, route guards check.
+Auth screens: Login, Register, ProfileOnboarding.
+The core loop: VoiceRecorder (Orb with all 5 states) → VoiceInput → Processing → VoiceEmotionPage / TextEmotion → EmotionResult → Guidance with AudioPlayer.
+Dashboard: ring gauge, trend chart, emotion mix, streak, history list and detail sheet.
+Landing and NotFound.
+Polish pass: reduced motion, light theme check, 320/375/768/1440 screenshots, keyboard-only walkthrough, contrast check, npm run build clean.
+
+After each step, take a screenshot at 375px and at 1280px and critique it against Sections 2–3 before proceeding. Remove any decoration that doesn't serve the person using the app.
+
+11. Acceptance criteria
+A first-time user can go from Landing to hearing their guidance in ≤ 5 taps (excluding permission prompts and sign-up).
+The Listening Orb is the only element with ambient animation anywhere in the app.
+Every emotion is identifiable by icon and label, not only by color.
+Every screen has designed loading, empty and error states.
+Lighthouse (mobile): Accessibility ≥ 95, Best Practices ≥ 90.
+No API, route, or env-var changes. npm run build completes with zero errors.
+The app feels calm: no flashing, no auto-playing audio, no countdown pressure, no gamified streak mechanics that guilt the user.
+
+Also minimise token usage as much as possible and if it is at 90% make sure to create an artifacte stating how much is complete and what needs to be done
+
+
+</USER_REQUEST>
+<ADDITIONAL_METADATA>
+The current local time is: 2026-10-20T19:28:07+05:30.
+
+The user's current state is as follows:
+Browser State:
+  Page 4FACFF9E94DC63273AF5A7A6F28D6495 (Vantage widget) - https://vantage.csw.lenovo.com/v1/web/containerwidget/default/ [ACTIVE]
+    Viewport: 298x59, Page Height: 59
+</ADDITIONAL_METADATA>
+<USER_SETTINGS_CHANGE>
+The user changed setting `Model Selection` from None to Claude Opus 4.6 (Thinking). No need to comment on this change if the user doesn't ask about it. If reporting what model you are, please use a human readable name instead of the exact string.
+</USER_SETTINGS_CHANGE>

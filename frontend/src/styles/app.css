@@ -1,0 +1,874 @@
+/* ==========================================================================
+   EmoGita Design System — "Night at the Yamuna"
+   Palette: River at dusk, peacock plume, warm marigold lamplight, lotus rose
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   3.1 Color & Surface Tokens
+   -------------------------------------------------------------------------- */
+:root {
+  /* Surfaces (Night - Default) */
+  --bg:             #0B2A35;  /* Yamuna: page background */
+  --bg-deep:        #07202A;  /* behind modals, footer */
+  --surface:        #123846;  /* panels */
+  --surface-raised: #184656;  /* hover/raised panels */
+  --line:           #2A5767;  /* 1px dividers, borders */
+
+  /* Text */
+  --text:           #EAF2F1;  /* primary, 13:1 on --bg */
+  --text-muted:     #9DB8BC;  /* secondary, 6:1 on --bg */
+  --text-faint:     #6F8E94;  /* hints only, never for essential info */
+
+  /* Brand */
+  --peacock:        #2BA39A;  /* primary actions, links, focus */
+  --peacock-strong: #1E827B;  /* pressed */
+  --marigold:       #F2A93B;  /* single warm accent: verse markers, key highlights */
+  --lotus:          #E7A6B5;  /* soft secondary: gentle states, empty illustrations */
+
+  /* Feedback */
+  --danger:         #E86A5C;
+  --success:        #5CC49A;
+
+  /* Emotion Tokens (Night) */
+  --emo-angry:      #E0574A;
+  --emo-disgust:    #98A840;
+  --emo-fear:       #9A6FD0;
+  --emo-happiness:  #F2B632;
+  --emo-neutral:    #8FA3AA;
+  --emo-confidence: #34C49C;
+  --emo-sadness:    #5B74CC;
+
+  /* Radii */
+  --r-sm:   6px;   /* inputs, chips */
+  --r-md:   14px;  /* panels */
+  --r-lg:   28px;  /* sheets, modals */
+  --r-full: 999px;
+
+  /* Elevation (tinted dark teal, not grey) */
+  --shadow-1: 0 1px 3px rgba(3, 18, 24, 0.5), 0 1px 2px rgba(3, 18, 24, 0.4);
+  --shadow-2: 0 12px 32px rgba(3, 18, 24, 0.45), 0 4px 12px rgba(3, 18, 24, 0.35);
+
+  /* Fonts */
+  --font-serif:    'Literata', Georgia, 'Times New Roman', serif;
+  --font-sanskrit: 'Tiro Devanagari Sanskrit', 'Noto Serif Devanagari', serif;
+  --font-sans:     'Instrument Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Spacing Scale (4px base) */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-18: 72px;
+  --space-28: 112px;
+
+  /* Transitions */
+  --ease-calm: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --duration-short: 180ms;
+}
+
+/* Light / Day Theme */
+:root[data-theme="light"] {
+  --bg:             #F1F6F5;
+  --bg-deep:        #E3EEEC;
+  --surface:        #FFFFFF;
+  --surface-raised: #F7FBFA;
+  --line:           #C9DBD9;
+
+  --text:           #11323C;
+  --text-muted:     #476A72;
+  --text-faint:     #7A9499;
+
+  --peacock:        #17746D;
+  --peacock-strong: #0F5A54;
+  --marigold:       #A86400;  /* darkened for WCAG contrast on light */
+  --lotus:          #B5576E;
+
+  --danger:         #B93A2D;
+  --success:        #23805C;
+
+  /* Emotion Tokens (Day - darkened ~15% for text use) */
+  --emo-angry:      #C83C2F;
+  --emo-disgust:    #7E8D2E;
+  --emo-fear:       #8056B3;
+  --emo-happiness:  #D49B1F;
+  --emo-neutral:    #6F838A;
+  --emo-confidence: #23A480;
+  --emo-sadness:    #475EB5;
+
+  --shadow-1: 0 1px 2px rgba(17, 50, 60, 0.12);
+  --shadow-2: 0 12px 32px rgba(17, 50, 60, 0.14);
+}
+
+/* --------------------------------------------------------------------------
+   Reset & Baseline
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  background-color: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* Skip link for accessibility */
+.skip-link {
+  position: absolute;
+  top: -100px;
+  left: 16px;
+  background: var(--peacock);
+  color: #07202A;
+  padding: 10px 18px;
+  border-radius: var(--r-sm);
+  font-weight: 600;
+  z-index: 10000;
+  text-decoration: none;
+  transition: top 0.2s var(--ease-calm);
+}
+.skip-link:focus {
+  top: 16px;
+  outline: 2px solid var(--text);
+  outline-offset: 2px;
+}
+
+/* Visible focus outline everywhere */
+:focus-visible {
+  outline: 2px solid var(--peacock);
+  outline-offset: 3px;
+}
+
+/* Typography elements */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--text);
+}
+
+h1 {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+  letter-spacing: -0.01em;
+}
+
+h2 {
+  font-size: 1.375rem;
+}
+
+h3 {
+  font-size: 1.125rem;
+}
+
+p {
+  color: var(--text);
+  line-height: 1.6;
+}
+
+a {
+  color: var(--peacock);
+  text-decoration: none;
+  transition: color var(--duration-short) var(--ease-calm);
+}
+a:hover {
+  text-decoration: underline;
+}
+
+/* Tabular numbers for dashboard / counters */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Container & Shell Layout */
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: var(--bg);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.page-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--space-6) var(--space-4) var(--space-18);
+}
+
+@media (min-width: 768px) {
+  .page-container {
+    padding: var(--space-8) var(--space-8) var(--space-18);
+  }
+}
+
+.reading-column {
+  width: 100%;
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+/* Panels */
+.panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-1);
+}
+
+.panel-raised {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-2);
+}
+
+/* --------------------------------------------------------------------------
+   4.1 PrimaryButton & Interactive Controls
+   -------------------------------------------------------------------------- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 52px;
+  min-height: 52px;
+  min-width: 48px;
+  padding: 0 var(--space-6);
+  border-radius: var(--r-full);
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background-color var(--duration-short) var(--ease-calm),
+              border-color var(--duration-short) var(--ease-calm),
+              color var(--duration-short) var(--ease-calm);
+  user-select: none;
+  text-decoration: none;
+  line-height: 1;
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--peacock);
+  color: var(--bg-deep);
+  border-color: transparent;
+}
+:root[data-theme="light"] .btn-primary {
+  color: #FFFFFF;
+}
+.btn-primary:hover:not(:disabled) {
+  background: var(--peacock-strong);
+}
+.btn-primary:active:not(:disabled) {
+  background: var(--peacock-strong);
+}
+
+.btn-secondary {
+  background: transparent;
+  color: var(--text);
+  border-color: var(--line);
+}
+.btn-secondary:hover:not(:disabled) {
+  background: var(--surface-raised);
+  border-color: var(--peacock);
+}
+
+.btn-quiet {
+  background: transparent;
+  color: var(--text);
+  border-color: transparent;
+  padding: 0 var(--space-4);
+  height: 44px;
+}
+.btn-quiet:hover:not(:disabled) {
+  color: var(--peacock);
+}
+
+.btn-danger {
+  background: transparent;
+  color: var(--danger);
+  border-color: var(--danger);
+}
+.btn-danger:hover:not(:disabled) {
+  background: rgba(232, 106, 92, 0.12);
+}
+
+/* --------------------------------------------------------------------------
+   4.2 The Listening Orb
+   -------------------------------------------------------------------------- */
+.orb-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-8) 0;
+  text-align: center;
+}
+
+.orb-button {
+  width: min(72vw, 300px);
+  height: min(72vw, 300px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 45% 45%, var(--surface-raised), var(--surface));
+  border: 2px solid var(--line);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 0 40px rgba(43, 163, 154, 0.08), var(--shadow-2);
+  transition: border-color var(--duration-short) var(--ease-calm),
+              box-shadow var(--duration-short) var(--ease-calm),
+              transform var(--duration-short) var(--ease-calm);
+  padding: var(--space-4);
+  color: var(--text);
+}
+
+/* Idle breathing animation */
+.orb-idle {
+  animation: orbBreathe 6s ease-in-out infinite;
+  border-color: var(--peacock);
+}
+
+@keyframes orbBreathe {
+  0%, 100% {
+    transform: scale(1);
+    box-shadow: 0 0 20px rgba(43, 163, 154, 0.15), var(--shadow-2);
+  }
+  50% {
+    transform: scale(1.04);
+    box-shadow: 0 0 48px rgba(43, 163, 154, 0.3), var(--shadow-2);
+  }
+}
+
+.orb-recording {
+  border-color: var(--danger);
+  box-shadow: 0 0 45px rgba(232, 106, 92, 0.28), var(--shadow-2);
+}
+
+.orb-dimmed {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.orb-waveform-canvas {
+  position: absolute;
+  top: -8px;
+  left: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  border-radius: 50%;
+  pointer-events: none;
+}
+
+.orb-label {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: var(--space-2);
+  color: var(--text);
+}
+
+.orb-hint {
+  font-size: 0.9375rem;
+  color: var(--text-muted);
+  margin-top: var(--space-3);
+  max-width: 340px;
+}
+
+.orb-timer {
+  font-family: var(--font-sans);
+  font-size: 1.5rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--text);
+  margin-top: var(--space-4);
+}
+
+/* --------------------------------------------------------------------------
+   4.3 Emotion Displays & Confidence Bars
+   -------------------------------------------------------------------------- */
+.emotion-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--space-8);
+  box-shadow: var(--shadow-1);
+}
+
+.emotion-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.emotion-icon-badge {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--r-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  flex-shrink: 0;
+}
+
+.emotion-bars-container {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
+
+.emotion-bar-row {
+  display: grid;
+  grid-template-columns: 100px 1fr 48px;
+  align-items: center;
+  gap: var(--space-3);
+  font-size: 0.875rem;
+}
+
+.emotion-bar-label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--text-muted);
+}
+
+.emotion-bar-track {
+  height: 8px;
+  background: rgba(42, 87, 103, 0.4);
+  border-radius: var(--r-full);
+  overflow: hidden;
+  position: relative;
+}
+
+.emotion-bar-fill {
+  height: 100%;
+  border-radius: var(--r-full);
+  transition: width 0.6s var(--ease-calm);
+}
+
+.emotion-bar-pct {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+/* --------------------------------------------------------------------------
+   4.4 Audio Player
+   -------------------------------------------------------------------------- */
+.audio-player-panel {
+  background: var(--surface-raised);
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  padding: var(--space-4) var(--space-6);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  width: 100%;
+}
+
+.audio-play-btn {
+  width: 56px;
+  height: 56px;
+  min-width: 56px;
+  border-radius: 50%;
+  background: var(--peacock);
+  color: var(--bg-deep);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color var(--duration-short) var(--ease-calm);
+}
+:root[data-theme="light"] .audio-play-btn {
+  color: #FFFFFF;
+}
+.audio-play-btn:hover {
+  background: var(--peacock-strong);
+}
+
+.audio-track-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.audio-seekbar {
+  width: 100%;
+  height: 6px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--line);
+  border-radius: var(--r-full);
+  outline: none;
+  cursor: pointer;
+}
+.audio-seekbar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--peacock);
+  cursor: pointer;
+}
+.audio-seekbar::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--peacock);
+  cursor: pointer;
+  border: none;
+}
+
+.audio-time-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.8125rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.audio-speed-btn {
+  background: transparent;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  color: var(--text-muted);
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: 600;
+  min-width: 44px;
+  min-height: 36px;
+}
+.audio-speed-btn:hover {
+  border-color: var(--peacock);
+  color: var(--text);
+}
+
+/* --------------------------------------------------------------------------
+   4.4b Loader (Slow-turning Calm Ring)
+   -------------------------------------------------------------------------- */
+.loader-ring {
+  border: 2px solid var(--line);
+  border-top-color: var(--peacock);
+  border-radius: 50%;
+  animation: calmSpin 1.6s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  display: inline-block;
+}
+
+@keyframes calmSpin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loader-screen {
+  min-height: calc(100vh - 80px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: var(--space-6);
+}
+
+/* --------------------------------------------------------------------------
+   4.5 Navbar & Navigation
+   -------------------------------------------------------------------------- */
+.top-navbar {
+  height: 72px;
+  background: var(--bg);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-4);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+@media (min-width: 768px) {
+  .top-navbar {
+    padding: 0 var(--space-8);
+  }
+}
+
+.nav-brand {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-decoration: none;
+  color: var(--text);
+}
+.nav-logo-img {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid var(--line);
+}
+.nav-wordmark {
+  font-family: var(--font-serif);
+  font-weight: 600;
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+  color: var(--text);
+}
+
+.nav-links-desktop {
+  display: none;
+  align-items: center;
+  gap: var(--space-6);
+}
+@media (min-width: 768px) {
+  .nav-links-desktop {
+    display: flex;
+  }
+}
+
+.nav-link-item {
+  color: var(--text-muted);
+  font-weight: 500;
+  font-size: 0.9375rem;
+  text-decoration: none;
+  padding: 8px 12px;
+  border-radius: var(--r-sm);
+  transition: color var(--duration-short) var(--ease-calm);
+}
+.nav-link-item:hover, .nav-link-item.active {
+  color: var(--text);
+  text-decoration: none;
+}
+.nav-link-item.active {
+  color: var(--peacock);
+}
+
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Bottom Tab Bar (Mobile) */
+.bottom-tab-bar {
+  display: flex;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 64px;
+  background: var(--surface);
+  border-top: 1px solid var(--line);
+  z-index: 100;
+  padding-bottom: env(safe-area-inset-bottom);
+}
+@media (min-width: 768px) {
+  .bottom-tab-bar {
+    display: none;
+  }
+}
+
+.bottom-tab-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 0.75rem;
+  font-weight: 500;
+  min-height: 48px;
+}
+.bottom-tab-item.active {
+  color: var(--peacock);
+}
+
+/* --------------------------------------------------------------------------
+   4.6 Form Fields
+   -------------------------------------------------------------------------- */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin-bottom: var(--space-6);
+}
+
+.form-label {
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.form-input, .form-textarea, .form-select {
+  height: 52px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 0 var(--space-4);
+  font-family: var(--font-sans);
+  font-size: 1rem; /* 16px min prevents iOS zoom */
+  color: var(--text);
+  transition: border-color var(--duration-short) var(--ease-calm),
+              box-shadow var(--duration-short) var(--ease-calm);
+  width: 100%;
+}
+
+.form-textarea {
+  height: auto;
+  min-height: 120px;
+  padding: var(--space-4);
+  resize: vertical;
+  line-height: 1.6;
+}
+
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  border-color: var(--peacock);
+  box-shadow: 0 0 0 3px rgba(43, 163, 154, 0.3);
+  outline: none;
+}
+
+.form-error-msg {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--danger);
+  font-size: 0.875rem;
+  margin-top: 2px;
+}
+
+/* --------------------------------------------------------------------------
+   5.8 Verse & Guidance Typography
+   -------------------------------------------------------------------------- */
+.verse-box {
+  border-left: 3px solid var(--marigold);
+  padding-left: var(--space-6);
+  margin: var(--space-8) 0;
+}
+
+.verse-sanskrit {
+  font-family: var(--font-sanskrit);
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  line-height: 1.9;
+  color: var(--text);
+  margin-bottom: var(--space-3);
+}
+
+.verse-english {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: var(--text-muted);
+  margin-bottom: var(--space-2);
+}
+
+.verse-reference {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--marigold);
+  letter-spacing: 0.5px;
+}
+
+.guidance-markdown {
+  font-family: var(--font-serif);
+  font-size: 1.125rem;
+  line-height: 1.75;
+  color: var(--text);
+  max-width: 68ch;
+}
+.guidance-markdown p {
+  margin-bottom: 1.25em;
+}
+.guidance-markdown strong {
+  color: var(--text);
+  font-weight: 600;
+}
+.guidance-markdown blockquote {
+  border-left: 3px solid var(--marigold);
+  padding-left: var(--space-4);
+  margin: 1.5em 0;
+  font-style: italic;
+  color: var(--text-muted);
+}
+.guidance-markdown ul, .guidance-markdown ol {
+  padding-left: var(--space-6);
+  margin-bottom: 1.25em;
+}
+.guidance-markdown li {
+  margin-bottom: 0.5em;
+}
+
+/* --------------------------------------------------------------------------
+   Footer Disclaimer
+   -------------------------------------------------------------------------- */
+.app-footer {
+  background: var(--bg-deep);
+  border-top: 1px solid var(--line);
+  padding: var(--space-8) var(--space-4) var(--space-12);
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+  margin-top: auto;
+}
+.footer-disclaimer {
+  max-width: 600px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* --------------------------------------------------------------------------
+   Accessibility: Reduced Motion
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .orb-idle {
+    animation: none;
+    border: 3px solid var(--peacock);
+  }
+}

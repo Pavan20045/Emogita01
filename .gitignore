@@ -1,0 +1,44 @@
+# General
+*.log
+*.tmp
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyd
+venv/
+ENV/
+env/
+venv/**
+
+# Model files
+*.pth
+*.pt
+*.ckpt
+
+# Environment files
+.env
+.env.example
+
+# Uploaded audio files
+uploads/
+
+# Node.js
+node_modules/
+npm-debug.log
+yarn-debug.log
+yarn-error.log
+
+# Build output
+build/
+public/build/
+
+# IDE/Editor
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
