@@ -111,6 +111,21 @@ UPLOAD_FOLDER = os.path.join(BASE_DIR, "uploads")
 VOICE_MODEL_PATH = os.path.join(BASE_DIR, "emotion_model.pth")
 TEXT_MODEL_PATH = os.path.join(BASE_DIR, "lstm_text_emotion.pth")
 
+# Automatically fetch weights from Hugging Face model repo if not present locally (e.g. Render / Cloud)
+try:
+    from huggingface_hub import hf_hub_download
+    HF_MODEL_REPO = os.getenv("HF_MODEL_REPO", "Pavan172874/emogita-models")
+    if not os.path.exists(TEXT_MODEL_PATH):
+        print(f"Downloading text emotion model from Hugging Face ({HF_MODEL_REPO})...")
+        TEXT_MODEL_PATH = hf_hub_download(repo_id=HF_MODEL_REPO, filename="lstm_text_emotion.pth")
+        print("Text emotion model downloaded successfully.")
+    if not os.path.exists(VOICE_MODEL_PATH):
+        print(f"Downloading voice emotion model from Hugging Face ({HF_MODEL_REPO})...")
+        VOICE_MODEL_PATH = hf_hub_download(repo_id=HF_MODEL_REPO, filename="emotion_model.pth")
+        print("Voice emotion model downloaded successfully.")
+except Exception as e:
+    print(f"Note: Error downloading model weights from Hugging Face: {e}")
+
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 # --------------------------------------------------

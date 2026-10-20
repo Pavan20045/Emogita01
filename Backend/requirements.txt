@@ -17,3 +17,7 @@ supabase
 scikit-learn
 gunicorn
 edge-tts
+huggingface_hub
+gTTS
+torch
+openpyxl
