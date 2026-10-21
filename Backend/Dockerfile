@@ -43,8 +43,8 @@ RUN python -c "import nltk; nltk.download('punkt'); nltk.download('punkt_tab')"
 # Copy the rest of the application code
 COPY --chown=user . $HOME/app/
 
-# Expose default port
-EXPOSE 10000 7860
+# Expose Render standard port
+EXPOSE 10000
 
-# Run gunicorn binding to $PORT (for Render/Cloud) or default to 10000
-CMD ["sh", "-c", "gunicorn -b 0.0.0.0:${PORT:-10000} --timeout 180 --workers 1 --threads 4 app:app"]
+# Run gunicorn on port 10000
+CMD ["gunicorn", "-b", "0.0.0.0:10000", "--timeout", "180", "--workers", "1", "--threads", "4", "app:app"]
